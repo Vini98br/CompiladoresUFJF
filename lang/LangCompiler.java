@@ -15,7 +15,7 @@ import lang.lexer.grammar.antlr.LangLexer;
 public class LangCompiler {
   public static void main(String[] args) throws IOException {
 
-    FileInputStream fis = new FileInputStream("roda.lan");
+    FileInputStream fis = new FileInputStream("test.lang");
     ANTLRInputStream input = new ANTLRInputStream(fis);
     Lexer lexer = new LangLexer(input);
 

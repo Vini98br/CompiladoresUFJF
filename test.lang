@@ -1,0 +1,14 @@
+data ( ) {
+print fat (10)[0];
+}
+fat (num :: Int ) : Int {
+if (num < 1)
+return 1 
+else
+return num * fat (num-1)[0] ;
+}
+divmod (num :: Int, div :: Int) : Int, Int {
+q = num / div;
+r = num % div;
+return q, r;
+}

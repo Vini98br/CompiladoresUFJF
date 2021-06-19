@@ -1,8 +1,0 @@
-data Ponto {
-   x :: Float;
-   y :: Float;
-}
-
-main(x :: Ponto){
-   print x.x;
-}
