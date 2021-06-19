@@ -1,4 +1,4 @@
-data ( ) {
+main ( ) {
 print fat (10)[0];
 }
 fat (num :: Int ) : Int {
