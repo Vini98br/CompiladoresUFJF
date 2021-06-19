@@ -1,0 +1,10 @@
+{
+  "java.project.referencedLibraries": [
+    "lib/**/*.jar",
+    "antlr-4.8-complete.jar",
+    "lang/lexer/grammar/antlr-4.8-complete.jar"
+  ],
+  "java.project.sourcePaths": [
+    "."
+  ]
+}
