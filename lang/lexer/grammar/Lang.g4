@@ -1,6 +1,73 @@
 /* Arthur Dornelas: 201735004, Vinicius Soranço: 201735003 */
 grammar Lang;
 
+prog: (data)* (func)*;
+
+data: DATA TYPE OPEN_CURLY_BRACER (decl)* CLOSE_CURLY_BRACER;
+
+decl: ID DOUBLE_COLON type SEMICOLON;
+
+func: ID OPEN_PARENTESIS (params)? CLOSE_PARENTESIS (COLON type (COMMA type)*)? OPEN_CURLY_BRACER (cmd)* CLOSE_CURLY_BRACER;
+
+params: ID DOUBLE_COLON type (COMMA ID DOUBLE_COLON type)*;
+
+type: type OPEN_BRACKET CLOSE_BRACKET
+      | btype;
+
+btype: BTYPE
+       | TYPE;
+
+cmd: OPEN_CURLY_BRACER (cmd)* CLOSE_CURLY_BRACER
+     | IF OPEN_PARENTESIS exp CLOSE_PARENTESIS cmd
+     | IF OPEN_PARENTESIS exp CLOSE_PARENTESIS cmd ELSE cmd
+     | ITERATE OPEN_PARENTESIS exp CLOSE_PARENTESIS cmd
+     | READ lvalue SEMICOLON
+     | PRINT exp SEMICOLON
+     | RETURN exp (COMMA exp)* SEMICOLON
+     | lvalue ATTRIBUTION exp SEMICOLON
+     | ID OPEN_PARENTESIS (exps)? CLOSE_PARENTESIS (LESS_THAN (COLON)? lvalue (COMMA lvalue)* (COLON)? MORE_THAN)? SEMICOLON;
+
+
+exp: exp AND exp
+     | rexp ;
+
+rexp:  rexp LESS_THAN aexp
+      | rexp MORE_THAN aexp
+      | rexp EQUAL aexp
+      | rexp NOT_EQUAL aexp
+      | aexp;
+
+aexp:  aexp PLUS mexp
+      | aexp MINUS mexp
+      | mexp;
+
+mexp:  mexp MULT sexp
+     | mexp DIV sexp
+     | mexp MOD sexp
+     | sexp;
+
+sexp:  NOT sexp
+     | MINUS sexp
+     | TRUE
+     | FALSE
+     | NULL
+     | INT
+     | FLOAT
+     | CHAR
+     | LITERAL
+     | pexp;
+
+pexp: lvalue
+     | OPEN_PARENTESIS exp CLOSE_PARENTESIS
+     | NEW type (OPEN_BRACKET exp CLOSE_BRACKET)?
+     | ID OPEN_PARENTESIS (exps)? CLOSE_PARENTESIS (OPEN_BRACKET exp CLOSE_BRACKET)?;
+
+lvalue: ID
+       | lvalue OPEN_BRACKET exp CLOSE_BRACKET
+       | lvalue ACCESSOR ID;
+
+exps: exp (COMMA exp)*;
+
 // Reserved keywords
 DATA      : 'data' ;
 PRINT     : 'print' ;
