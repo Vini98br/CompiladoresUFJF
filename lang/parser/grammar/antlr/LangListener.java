@@ -1,5 +1,5 @@
-// Generated from ./lang/lexer/grammar/Lang.g4 by ANTLR 4.8
-package lang.lexer.grammar.antlr;
+// Generated from lang/parser/grammar/Lang.g4 by ANTLR 4.8
+package lang.parser.grammar.antlr;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
