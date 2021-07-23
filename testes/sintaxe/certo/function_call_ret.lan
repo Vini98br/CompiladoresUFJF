@@ -6,5 +6,4 @@ f(x :: Int) : Int{
 
 main(v :: Int[], f :: Float){
   z = 10;
-  f(z);
 }

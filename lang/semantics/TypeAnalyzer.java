@@ -666,6 +666,6 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
 
         System.out.println("\u001B[31m" + errorMessage + "\u001B[0m");
 
-        System.exit(code);
+        // System.exit(code);
     }
 }

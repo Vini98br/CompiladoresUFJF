@@ -43,7 +43,7 @@ public class LangCompiler {
       }
       if (args[0].equals("-bsm")) {
         System.out.println("Executando bateria de testes sintáticos:");
-        TestInterpreter.runInterpreterTests(langParser);
+        TestInterpreter ti = new TestInterpreter(langParser);
         return;
       }
       if (args.length != 2) {

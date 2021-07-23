@@ -6,6 +6,5 @@ f(x :: Int) : Int, Float{
 
 main(v :: Int[], f :: Float){
   z = 10;
-  h = 2*f(z)[0] + f(z)[1];
-  print h;
+  print z;
 }
