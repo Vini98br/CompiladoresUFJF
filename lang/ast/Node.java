@@ -1,11 +1,11 @@
-/* Jean Paiva: 20153522, Thales Castro: 201535025 */
+// Arthur Dornelas: 201735004, Vinicius Soranço: 201735003
+
 package lang.ast;
 
 import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-public class Node extends SuperNode
-{
+public class Node extends SuperNode {
     private Integer line;
     private Integer column;
     private final ParseTree parseTree;
@@ -21,19 +21,16 @@ public class Node extends SuperNode
     }
 
     @Override
-    public int getLine()
-    {
+    public int getLine() {
         return this.line;
     }
 
     @Override
-    public int getColumn()
-    {
+    public int getColumn() {
         return this.column;
     }
 
-    public Vocabulary getVocabulary()
-    {
+    public Vocabulary getVocabulary() {
         return vocabulary;
     }
 }

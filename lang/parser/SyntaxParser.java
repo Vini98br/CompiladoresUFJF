@@ -1,4 +1,4 @@
-/* Jean Paiva: 20153522, Thales Castro: 201535025 */
+// Arthur Dornelas: 201735004, Vinicius Soranço: 201735003
 
 package lang.parser;
 
@@ -15,11 +15,9 @@ import java.io.IOException;
 
 import static org.antlr.v4.runtime.CharStreams.fromFileName;
 
-public class SyntaxParser implements ParseAdaptor
-{
+public class SyntaxParser implements ParseAdaptor {
     @Override
-    public SuperNode parseFile(String path)
-    {
+    public SuperNode parseFile(String path) {
         try {
             CharStream inputLanguage = fromFileName(path);
             LangLexer langLexer = new LangLexer(inputLanguage);

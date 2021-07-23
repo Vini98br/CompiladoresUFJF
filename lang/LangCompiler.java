@@ -1,8 +1,10 @@
+// Arthur Dornelas: 201735004, Vinicius Soranço: 201735003
 package lang;
 
 import java.io.*;
 import lang.parser.*;
 import lang.ast.*;
+import lang.interpreter.TestInterpreter;
 
 public class LangCompiler {
   // Recupera o nome base (sem extensão) de um arquivo.
@@ -41,7 +43,7 @@ public class LangCompiler {
       }
       if (args[0].equals("-bsm")) {
         System.out.println("Executando bateria de testes sintáticos:");
-        // TestParser tp = new TestParser(langParser);
+        TestInterpreter.runInterpreterTests(langParser);
         return;
       }
       if (args.length != 2) {
