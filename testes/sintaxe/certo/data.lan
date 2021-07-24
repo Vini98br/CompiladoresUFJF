@@ -8,5 +8,6 @@ f(d :: Int ) : Int, Char{
 }
 
 main(x :: Ponto){
+   print x.x;
    z = f(0)[0] + 2;
 }

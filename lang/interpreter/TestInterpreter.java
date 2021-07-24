@@ -5,7 +5,6 @@ package lang.interpreter;
 import java.io.*;
 import lang.ast.Node;
 import lang.parser.ParseAdaptor;
-import lang.semantics.TypeAnalyzer;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 public class TestInterpreter {
@@ -52,7 +51,6 @@ public class TestInterpreter {
                             return;
                         }
 
-                        TypeAnalyzer typeAnalyzer = new TypeAnalyzer(parseTree, pth);
                         Interpreter interpreter = new Interpreter(parseTree, node.getVocabulary());
                         flips++;
                     } catch (Exception e) {

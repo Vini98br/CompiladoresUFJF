@@ -3,6 +3,10 @@ data Ponto {
    y :: Float;
 }
 
-main(){
-   l = 1;
+main(l :: Int){
+   p = new Ponto;
+   z = new Int[][2*l];
+   z[0] = new Int[10];
+   wrong = new Int;
+   print p.x;
 }

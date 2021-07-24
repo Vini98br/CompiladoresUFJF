@@ -47,7 +47,7 @@ public class Interpreter extends LangBaseVisitor<Object> {
             return visitFunc(functions.get("main"));
         }
 
-        System.exit(40);
+        // System.exit(40);
         return null;
     }
 
@@ -94,7 +94,7 @@ public class Interpreter extends LangBaseVisitor<Object> {
         LangParser.ParamsContext params = ctx.params();
         if (!functionName.equals("main") && params != null) {
             if (this.parametersBeingPassed.size() != params.ID().size()) {
-                System.exit(42);
+                // System.exit(42);
                 return null;
             }
 
@@ -215,7 +215,7 @@ public class Interpreter extends LangBaseVisitor<Object> {
             LangParser.FuncContext function = this.functions.get(functionName);
 
             if (function == null) {
-                System.exit(41);
+                // System.exit(41);
                 return null;
             }
 
@@ -227,7 +227,7 @@ public class Interpreter extends LangBaseVisitor<Object> {
 
             if (ctx.LESS_THAN() != null) {
                 if (ctx.lvalue().size() != this.expressionsBeingReturned.size()) {
-                    System.exit(43);
+                    // System.exit(43);
                 }
 
                 for (LangParser.LvalueContext identifier : ctx.lvalue()) {
@@ -333,7 +333,7 @@ public class Interpreter extends LangBaseVisitor<Object> {
                 return !(Boolean) valueToBeNegated;
             }
 
-            System.exit(32);
+            // System.exit(32);
         }
 
         if (firstChild == ctx.MINUS()) {
@@ -351,7 +351,7 @@ public class Interpreter extends LangBaseVisitor<Object> {
                 return -1 * (Double) valueToBeInverted;
             }
 
-            System.exit(23);
+            // System.exit(23);
         }
 
         if (firstChild == ctx.INT()) {
@@ -396,7 +396,7 @@ public class Interpreter extends LangBaseVisitor<Object> {
             LangParser.FuncContext function = this.functions.get(functionName);
 
             if (function == null) {
-                System.exit(41);
+                // System.exit(41);
                 return null;
             }
 
@@ -447,7 +447,7 @@ public class Interpreter extends LangBaseVisitor<Object> {
         }
 
         if (rightSide.getClass() != leftSide.getClass()) {
-            System.exit(22);
+            // System.exit(22);
         }
 
         switch (operation) {
@@ -497,10 +497,10 @@ public class Interpreter extends LangBaseVisitor<Object> {
                 break;
 
             default:
-                System.exit(20);
+                // System.exit(20);
         }
 
-        System.exit(21);
+        // System.exit(21);
         return 0;
     }
 
@@ -551,10 +551,10 @@ public class Interpreter extends LangBaseVisitor<Object> {
                 break;
 
             default:
-                System.exit(30);
+                // System.exit(30);
         }
 
-        System.exit(31);
+        // System.exit(31);
 
         return false;
     }
@@ -571,7 +571,7 @@ public class Interpreter extends LangBaseVisitor<Object> {
             }
         }
 
-        System.exit(10);
+        // System.exit(10);
         return 0;
     }
 

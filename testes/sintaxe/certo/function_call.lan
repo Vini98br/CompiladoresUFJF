@@ -6,4 +6,5 @@ f(x :: Int){
 
 main(v :: Int[], f :: Float){
   z = 10;
+  f(z);
 }
