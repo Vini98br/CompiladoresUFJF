@@ -5,6 +5,8 @@ package lang.interpreter;
 import java.io.*;
 import lang.ast.Node;
 import lang.parser.ParseAdaptor;
+import lang.semantics.TypeAnalyzer;
+
 import org.antlr.v4.runtime.tree.ParseTree;
 
 public class TestInterpreter {
@@ -38,10 +40,11 @@ public class TestInterpreter {
             if (f.isDirectory()) {
                 String pth;
                 inst = f.listFiles();
+                System.out.println();
                 for (File s : inst) {
                     try {
                         pth = s.getPath();
-                        System.out.println("Testando " + pth + filler(50 - pth.length()));
+                        System.out.println("\u001B[32m" + "Testando " + pth + filler(50 - pth.length()) + "\u001B[0m");
 
                         Node node = (Node) this.adp.parseFile(pth);
 
@@ -50,8 +53,12 @@ public class TestInterpreter {
                         if (parseTree == null) {
                             return;
                         }
+                        TypeAnalyzer typeAnalyzer = new TypeAnalyzer(parseTree, pth);
+                        System.out.println("TypeAnalyser finalizado.");
 
                         Interpreter interpreter = new Interpreter(parseTree, node.getVocabulary());
+                        System.out.println("Interpreter finalizado.");
+                        System.out.println();
                         flips++;
                     } catch (Exception e) {
                         flops++;

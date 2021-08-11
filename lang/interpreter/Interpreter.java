@@ -12,22 +12,39 @@ import java.util.*;
 public class Interpreter extends LangBaseVisitor<Object> {
     private final Vocabulary vocabulary;
 
+    // Pilha da Memoria
     private final Stack<HashMap<String, Object>> programMemory;
+
+    // Funções
     private final HashMap<String, LangParser.FuncContext> functions;
+
+    // Parametros que são passados
     private final ArrayList<Object> parametersBeingPassed;
+
+    // Parametros que são retornados
     private final ArrayList<Object> expressionsBeingReturned;
 
+    // Recebe a arvore do parser e o vocabulario da linguagem
     public Interpreter(ParseTree parseTree, Vocabulary vocabulary) {
+
+        // Instancia a pilha da memoria
         this.programMemory = new Stack<>();
         // esse seria o escopo global do programa, onde ficam os tipos criados pelo
         // usuário
+
+        // Instancia os hashMaps da memoria
         programMemory.push(new HashMap<>());
 
+        // Instancia o hashmap das funcoes
         this.functions = new HashMap<>();
 
+        // Instancia o arrayList dos parametros que são passados
         this.parametersBeingPassed = new ArrayList<>();
+
+        // Instancia o arrayList dos parametros que são retornados
         this.expressionsBeingReturned = new ArrayList<>();
 
+        // Recebe o vocabulario da linguagem
         this.vocabulary = vocabulary;
 
         this.visit(parseTree);
@@ -35,14 +52,17 @@ public class Interpreter extends LangBaseVisitor<Object> {
 
     @Override
     public Object visitProg(LangParser.ProgContext ctx) {
+        // foreach de cada DataContext em ctx.data()
         for (LangParser.DataContext customType : ctx.data()) {
             visitData(customType);
         }
 
+        // foreach de cada FuncContext em ctx.func()
         for (LangParser.FuncContext funcContext : ctx.func()) {
             functions.put(funcContext.ID().toString(), funcContext);
         }
 
+        // Verifica se tem funcao main, se tem retora, senão vai pro null
         if (functions.get("main") != null) {
             return visitFunc(functions.get("main"));
         }
@@ -57,24 +77,30 @@ public class Interpreter extends LangBaseVisitor<Object> {
         // que o
         // `programMemory` só o primeiro item da pilha, que serve como o escopo global
         // do programa.
+
         HashMap<String, Object> globalProgramState = this.programMemory.peek();
 
+        // HashMap dos tipos
         HashMap<String, Object> typeProperties = new HashMap<>();
 
+        // foreach de cada DeclContext em ctx.decl()
         for (LangParser.DeclContext property : ctx.decl()) {
             Object propertyDefinition = visitDecl(property);
 
+            // Coloca a propertyDefinition da declaracao no hash de tipos com o nome do ID e
+            // Tipo do ID
             if (propertyDefinition instanceof HashMap) {
                 typeProperties.put(((HashMap) propertyDefinition).get("identifierName").toString(),
                         ((HashMap) propertyDefinition).get("identifierType"));
             }
         }
-
+        // coloca o tipo properties no programState
         globalProgramState.put(ctx.TYPE().getText(), typeProperties);
 
         return null;
     }
 
+    // Retorna a nome e a tipo da propriedade
     @Override
     public Object visitDecl(LangParser.DeclContext ctx) {
         HashMap<String, Object> propertyDefinition = new HashMap<>();
@@ -85,19 +111,30 @@ public class Interpreter extends LangBaseVisitor<Object> {
         return propertyDefinition;
     }
 
+    // Roda para cada funçao
     @Override
     public Object visitFunc(LangParser.FuncContext ctx) {
+        // guarda nome do params e valor
         HashMap<String, Object> functionState = new HashMap<>();
 
+        // Pega o id da funcao
         String functionName = ctx.ID().toString();
 
+        // Pega os params da funcao
         LangParser.ParamsContext params = ctx.params();
+
+        // funcao que tenha parametros e não é a main
         if (!functionName.equals("main") && params != null) {
+
+            // Se os parametros passados tiverem diferentes dos que precisa da erro
             if (this.parametersBeingPassed.size() != params.ID().size()) {
                 // System.exit(42);
                 return null;
             }
 
+            // percorre os params, pega ele e remove, colocando seu identifier e valor na
+            // function
+            // state
             for (Object parameterIdentifier : params.ID()) {
                 Object parameterValue = this.parametersBeingPassed.get(0);
                 this.parametersBeingPassed.remove(0);
@@ -106,11 +143,14 @@ public class Interpreter extends LangBaseVisitor<Object> {
             }
         }
 
+        // coloca na pilha de memoria
         this.programMemory.push(functionState);
 
+        // Roda os cmds e visita
         for (LangParser.CmdContext command : ctx.cmd()) {
             Object commandReturnedValue = visitCmd(command);
 
+            // Se n for null da um pop
             if (commandReturnedValue != null) {
                 this.programMemory.pop();
                 return commandReturnedValue;
