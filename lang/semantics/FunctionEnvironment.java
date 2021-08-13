@@ -9,14 +9,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class FunctionEnvironment {
+    // Nome da função
     private final String functionName;
+    // Contexto da função
     private final LangParser.FuncContext funcContext;
     private Boolean visited;
 
+    // Tipos de retorno da função
     private final ArrayList<Type> functionReturnTypes;
+    // Parâmetros da função
     private final ArrayList<Type> functionParameterTypes;
+    // Variáveis que estão sendo retornadas
     private final ArrayList<ArrayList<Type>> variablesActuallyBeingReturned = new ArrayList<>();
 
+    // Hash map responsável por mapear nome da variável e a variável de fato
     private final HashMap<String, Type> symbolTable;
 
     public FunctionEnvironment(String functionName, LangParser.FuncContext funcContext,
@@ -36,6 +42,9 @@ public class FunctionEnvironment {
         return funcContext;
     }
 
+    // Realiza a declaração da variável
+    // A declaração da variável está dentro FunctionEnvironment para mantermos o
+    // escopo da função em questão
     public void declareVariable(String name, Type type) {
         symbolTable.put(name, type);
     }
@@ -52,6 +61,7 @@ public class FunctionEnvironment {
         visited = true;
     }
 
+    // Pega uma variável pelo seu nome
     public Type getVariableType(String name) {
         return symbolTable.get(name);
     }
@@ -72,6 +82,7 @@ public class FunctionEnvironment {
         return variablesActuallyBeingReturned;
     }
 
+    // Verifica se a variável existe no hash map
     public Boolean isVariableDeclared(String name) {
         return symbolTable.get(name) != null;
     }

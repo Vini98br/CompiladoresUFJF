@@ -15,10 +15,19 @@ import java.util.HashMap;
 import java.util.Stack;
 
 public class TypeAnalyzer extends LangBaseVisitor<Object> {
+    // Guarda FunctionEnvironment e seu identificador de todas as funções presentes
+    // no programa
     private final HashMap<String, FunctionEnvironment> programEnvironment = new HashMap<>();
+    // Guarda FunctionContext e seu identificador de todas as funções presentes no
+    // programa
     private final HashMap<String, LangParser.FuncContext> functions = new HashMap<>();
+
+    // Usa a mesma abordagem do FunctionEnvironment para armazenar as declarações
+    // dentro do tipo data. Declaração de tipos Data
     private final HashMap<String, Data> abstractDataTypes = new HashMap<>();
 
+    // Pilha para armazenar a função que está sendo executada no momento, de forma a
+    // simplificar o acesso a ela em diferentes métodos.
     private final Stack<FunctionEnvironment> functionEnvironments = new Stack<>();
 
     private final String filename;
@@ -39,17 +48,21 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
             visitData(typeDeclaration);
         }
 
+        // Percorre todas as funções do programa
         for (LangParser.FuncContext functionContext : ctx.func()) {
             String functionName = functionContext.ID().getText();
 
+            // Guarda a função com seu nome e seu contexto
             functions.put(functionName, functionContext);
 
             ArrayList<Type> functionParametersTypes = new ArrayList<>();
             if (functionContext.params() != null) {
+                // Tipos dos parâmetros da função declarados na declaração da função
                 functionParametersTypes = visitParams(functionContext.params());
             }
 
             ArrayList<Type> functionReturnsTypes = new ArrayList<>();
+            // Tipos de retorno da função declarados na declaração da função
             for (LangParser.TypeContext typeContext : functionContext.type()) {
                 functionReturnsTypes.add(visitType(typeContext));
             }
@@ -57,6 +70,7 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
             FunctionEnvironment functionEnvironment = new FunctionEnvironment(functionName, functionContext,
                     functionParametersTypes, functionReturnsTypes);
 
+            // Guarda a função do programa com seu nome e seu Environment
             programEnvironment.put(functionName, functionEnvironment);
         }
 
@@ -97,9 +111,12 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
 
         functionEnvironments.push(programEnvironment.get(currentFunctionName));
 
+        // Faz o peek para não mudar a referencia do objeto dentro da pilha, pois vai
+        // ser usado posteriormente no visitCmd
         FunctionEnvironment currentFunctionEnvironment = functionEnvironments.peek();
         currentFunctionEnvironment.markAsVisited();
 
+        // Manda o conteúdo para o visitCmd incluindo as chaves. Ex.: main { cmd }
         for (LangParser.CmdContext command : ctx.cmd()) {
             visitCmd(command);
         }
@@ -153,6 +170,7 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
         ArrayList<Type> functionParameters = new ArrayList<>();
 
         for (LangParser.TypeContext type : ctx.type()) {
+            // Adiciona os tipos dos parâmetros da função
             functionParameters.add(visitType(type));
         }
 
@@ -198,12 +216,17 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
 
     @Override
     public Object visitCmd(LangParser.CmdContext ctx) {
+        // Pegamos a referencia da função que esta no topo da pilha
         FunctionEnvironment currentFunctionEnvironment = functionEnvironments.peek();
 
         if (ctx.ATTRIBUTION() != null) {
+            // Retorna Variável (tipo Type) ou uma string com apenas o nom e dela
             Object variable = visitLvalue(ctx.lvalue(0));
+            // Tipo do dado que esta sendo atribuido a variable
             Type expressionType = visitExp(ctx.exp(0));
 
+            // Caso a variável não exista, ou seja, seja do tipo String, declaramos a
+            // variável no escopo dessa função
             if (!(variable instanceof Type)) {
                 currentFunctionEnvironment.declareVariable((String) variable, expressionType);
                 return null;
@@ -211,6 +234,8 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
 
             Type variableType = (Type) variable;
 
+            // NOTE - Aqui lidamos com declaração de uma variável de mesmo nome mas com
+            // outro tipo
             if (!variableType.match(expressionType)) {
                 error(11, String.format("Variável já declarada com tipo %s", variableType.typeName()), ctx);
             }
@@ -224,6 +249,7 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
             Object variable = visitLvalue(ctx.lvalue(0));
 
             if (variable instanceof String) {
+                // Variável não existe e precisamos declarar
                 currentFunctionEnvironment.declareVariable((String) variable, new UnreadValue());
                 return null;
             }
@@ -242,6 +268,7 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
                 return null;
             }
 
+            // Chama recursão com todo o conteúdo dentro do if
             for (LangParser.CmdContext command : ctx.cmd()) {
                 visitCmd(command);
             }
@@ -250,12 +277,13 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
         if (ctx.ITERATE() != null) {
             Type expresionResult = visitExp(ctx.exp(0));
 
-            if (!expresionResult.match(new Int())) {
+            if (!expresionResult.match(new Bool())) {
                 error(51, String.format("Teste do comando 'iterate' não é uma expressão booleana, %s encontrado",
                         expresionResult.typeName()), ctx);
                 return null;
             }
 
+            // Chama recursão para o comando dentro do bloco iterate
             visitCmd(ctx.cmd(0));
         }
 
@@ -263,13 +291,16 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
             ArrayList<Type> variablesBeingReturned = new ArrayList<>();
 
             for (LangParser.ExpContext expContext : ctx.exp()) {
+                // Retorna o tipo das variáveis sendo retornadas
                 variablesBeingReturned.add(visitExp(expContext));
             }
 
+            // Altera retornos da função que esta cabeça da pilha
             currentFunctionEnvironment.addReturnStatementVariables(variablesBeingReturned);
         }
 
         if (ctx.OPEN_CURLY_BRACER() != null) {
+            // Começa a leitura dos comandos dentro da função
             for (LangParser.CmdContext command : ctx.cmd()) {
                 visitCmd(command);
             }
@@ -442,9 +473,12 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
         return leftSide;
     }
 
+    // Função que lida com o retorno do tipo de um determinado valor
     @Override
     public Type visitSexp(LangParser.SexpContext ctx) {
+
         if (ctx.NOT() != null) {
+            // Aplica recursão com apenas o valor, sem o not (!)
             Type type = visitSexp(ctx.sexp());
 
             if (!(type.match(new Bool()))) {
@@ -455,6 +489,7 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
         }
 
         if (ctx.MINUS() != null) {
+            // Aplica recursão com apenas o valor, sem o menos (-)
             Type type = visitSexp(ctx.sexp());
 
             if (!(type.match(new Int()) || type.match(new Float()))) {
@@ -529,11 +564,18 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
         }
 
         if (ctx.ID() != null) {
-            String functionName = ctx.ID().getText();
-            FunctionEnvironment functionEnvironment = programEnvironment.get(functionName);
+            // Ex.:
+            // main () {
+            // divMod() ]
+            // }
+            String functionName = ctx.ID().getText(); // Pega o divMod
+            FunctionEnvironment functionEnvironment = programEnvironment.get(functionName); // Pega o environment de
+                                                                                            // divMod no HashMaps de
+                                                                                            // Environments
 
             testFunctionCall(functionName, ctx.exps(), ctx);
 
+            // Verifica se divMod já foi visitada
             if (!functionEnvironment.hasBeenVisited()) {
                 visitFunc(functions.get(functionName));
             }
@@ -550,12 +592,15 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
             }
 
             if (numberOfReturns > 1) {
+                // Se a função tiver mais de um retorno é necessário ter o [] para acessar qual
+                // deseja
                 if (ctx.OPEN_BRACKET() == null) {
                     error(52, String.format(
                             "A função '%s' retorna %s valores, por isso, é necessário passar o índice do parâmetro que será usado entre colchetes",
                             functionName, numberOfReturns), ctx);
                 }
 
+                // Visita exp dentro do []
                 Type type = visitExp(ctx.exp());
                 if (!(type.match(new Int()))) {
                     error(53, String.format("O valor passado entre colchetes deve ser do tipo Int, %s passado",
@@ -577,19 +622,25 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
 
     @Override
     public Object visitLvalue(LangParser.LvalueContext ctx) {
+        // Pegamos a referencia da função que esta no topo da pilha
         FunctionEnvironment currentFunctionEnvironment = functionEnvironments.peek();
 
         if (ctx.getChildCount() == 1) {
             String variableName = ctx.ID().getText();
 
+            // Se essa função ainda não foi declarada no escopo dessa função, retornamos
+            // apenas o nome dela
             if (!currentFunctionEnvironment.isVariableDeclared(variableName)) {
                 return variableName;
             }
 
+            // Senão retornamos a própria variável
             return currentFunctionEnvironment.getVariableType(variableName);
         }
 
+        // Ex.: x = y[1]
         if (ctx.OPEN_BRACKET() != null) {
+            // Recursão para pegar variável y
             Object variable = visitLvalue(ctx.lvalue());
 
             if (!(variable instanceof Type)) {
@@ -608,8 +659,11 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
             }
         }
 
+        // Ex.: x = y.w
         if (ctx.ACCESSOR() != null) {
+            // Recursão para pegar variável y
             Object variable = visitLvalue(ctx.lvalue());
+            // Pega nome de w
             String propertyName = ctx.ID().getText();
 
             if (!(variable instanceof Type)) {
@@ -622,6 +676,7 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
 
             Type variableType = (Type) variable;
 
+            // Senão for data y é String, Int, ... não contendo propriedade w
             if (!(variableType instanceof Data)) {
                 String typeName = variableType.typeName();
 
@@ -633,6 +688,7 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
 
             Data abstractType = abstractDataTypes.get(variableType.typeName());
 
+            // Se for Data e não possui a propriedade que deseja acessar
             if (!abstractType.hasProperty(propertyName)) {
                 error(15, String.format("Tipo abstrato '%s' não possui a propriedade '%s'", abstractType.typeName(),
                         propertyName), ctx);
@@ -666,5 +722,6 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
 
         System.out.print("Ocorreu um erro na execução do Analisador Semântico: ");
         System.out.println("\u001B[31m" + errorMessage + "\u001B[0m");
+        // System.exit(code);
     }
 }

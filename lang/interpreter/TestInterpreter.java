@@ -60,6 +60,10 @@ public class TestInterpreter {
                         System.out.println("Interpreter finalizado.");
                         System.out.println();
                         flips++;
+
+                    } catch (RuntimeException re) {
+                        // Silenciar erros de run time causados por não parar execução (System.exit())
+                        // depois de um erro capturado no analisados semântico
                     } catch (Exception e) {
                         flops++;
                         System.out.println(e.getMessage());
