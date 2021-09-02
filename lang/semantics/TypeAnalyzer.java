@@ -112,7 +112,7 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
         functionEnvironments.push(programEnvironment.get(currentFunctionName));
 
         // Faz o peek para não mudar a referencia do objeto dentro da pilha, pois vai
-        // ser usado posteriormente no visitCmd
+        // ser usado posteriormente em outros métodos
         FunctionEnvironment currentFunctionEnvironment = functionEnvironments.peek();
         currentFunctionEnvironment.markAsVisited();
 
@@ -354,6 +354,7 @@ public class TypeAnalyzer extends LangBaseVisitor<Object> {
         FunctionEnvironment functionBeingCalled = programEnvironment.get(functionName);
         LangParser.FuncContext funcContext = functions.get(functionName);
 
+        System.out.println(expsContext.getText());
         if (functionBeingCalled == null) {
             error(41, String.format("A função '%s' sendo chamada não foi declarada no programa", functionName), ctx);
         }
