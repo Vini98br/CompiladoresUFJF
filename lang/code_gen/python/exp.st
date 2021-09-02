@@ -1,0 +1,1 @@
+exp(leftSide, operator, rightSide) ::= "<leftSide> <operator> <rightSide>"

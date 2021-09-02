@@ -1,0 +1,1 @@
+decl(id) ::= "'<id>': None"

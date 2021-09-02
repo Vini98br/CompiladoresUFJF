@@ -1,0 +1,1 @@
+attribution(variable, exp) ::= "<variable> = <exp>"

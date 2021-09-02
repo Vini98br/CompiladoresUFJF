@@ -4,6 +4,7 @@ package lang;
 import java.io.*;
 import lang.parser.*;
 import lang.ast.*;
+import lang.code_gen.TestCodeGen;
 import lang.interpreter.TestInterpreter;
 
 public class LangCompiler {
@@ -44,6 +45,18 @@ public class LangCompiler {
       if (args[0].equals("-bsm")) {
         System.out.println("Executando bateria de testes sintáticos:");
         TestInterpreter ti = new TestInterpreter(langParser);
+        return;
+      }
+      if (args[0].equals("-python")) {
+        System.out.println("Compilando o arquivo para um script Python");
+
+        String directory = "testes/semantica/certo/";
+
+        if (args.length == 2 && !args[1].equals("")) {
+          directory = args[1];
+        }
+
+        TestCodeGen.generatePythonCode(langParser, directory);
         return;
       }
       if (args.length != 2) {

@@ -7,4 +7,4 @@ java -jar lang/parser/grammar/antlr-4.8-complete.jar -o lang/parser/grammar/antl
 
 javac -cp .:lang/parser/grammar/antlr-4.8-complete.jar lang/LangCompiler.java
 
-java -cp .:lang/parser/grammar/antlr-4.8-complete.jar lang/LangCompiler -bsm
+java -cp .:lang/parser/grammar/antlr-4.8-complete.jar lang/LangCompiler -python

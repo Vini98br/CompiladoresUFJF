@@ -1,0 +1,1 @@
+cmd(line) ::= <%<line; separator="\n">%>
